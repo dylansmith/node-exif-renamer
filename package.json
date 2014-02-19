@@ -1,0 +1,46 @@
+{
+  "name": "exif-renamer",
+  "description": "A NodeJS service to rename photos using their EXIF data.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/dylansmith/node-exif-renamer",
+  "author": {
+    "name": "Dylan Smith",
+    "email": "dylansmith@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/dylansmith/node-exif-renamer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dylansmith/node-exif-renamer/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/dylansmith/node-exif-renamer/blob/master/LICENSE-MIT"
+    }
+  ],
+  "main": "lib/exif-renamer",
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "test": "grunt nodeunit"
+  },
+  "devDependencies": {
+    "grunt-contrib-jshint": "~0.6.4",
+    "grunt-contrib-nodeunit": "~0.2.0",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt": "~0.4.2"
+  },
+  "keywords": [],
+  "dependencies": {
+    "exif": "~0.3.3",
+    "q": "~1.0.0",
+    "dateformat": "~1.0.7-1.2.3",
+    "lodash": "~2.4.1",
+    "object-path": "~0.1.2",
+    "watchr": "~2.4.11",
+    "mkdirp": "~0.3.5"
+  }
+}
