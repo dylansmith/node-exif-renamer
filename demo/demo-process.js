@@ -9,7 +9,6 @@ var path = require('path'),
 
 doge_prefixer = function(fileinfo, metadata) {
     var dogeisms = ['very', 'wow', 'so', 'much'];
-    console.log(arguments);
     return [dogeisms[Math.floor(Math.random() * dogeisms.length)], fileinfo.basename].join('_');
 }
 
