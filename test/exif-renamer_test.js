@@ -1,6 +1,6 @@
 'use strict';
 
-var exif_renamer = require('../lib/exif-renamer.js');
+//var exif_renamer = require('../lib/exif-renamer.js');
 
 /*
   ======== A Handy Little Nodeunit Reference ========
@@ -22,15 +22,15 @@ var exif_renamer = require('../lib/exif-renamer.js');
     test.ifError(value)
 */
 
-exports['awesome'] = {
-  setUp: function(done) {
-    // setup here
-    done();
-  },
-  'no args': function(test) {
-    test.expect(1);
-    // tests here
-    test.equal(exif_renamer.awesome(), 'awesome', 'should be awesome.');
-    test.done();
-  },
-};
+// exports['awesome'] = {
+//   setUp: function(done) {
+//     // setup here
+//     done();
+//   },
+//   'no args': function(test) {
+//     test.expect(1);
+//     // tests here
+//     test.equal(exif_renamer.awesome(), 'awesome', 'should be awesome.');
+//     test.done();
+//   },
+// };

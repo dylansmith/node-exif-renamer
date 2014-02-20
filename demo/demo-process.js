@@ -1,35 +1,42 @@
 var path = require('path'),
     _ = require('lodash'),
     Q = require('q'),
+    helpers = require('./helpers'),
+    log = console.log,
     exifRenamer = require('../lib/exif-renamer'),
     img = path.resolve(__dirname, 'test.jpg'),
-    examples = {
-        'Prefix with a default datetime':                   '%date_%file',
-        'Prefix with "YY-MM" datetime':                     '%yy-%mm-%file',
-        'Move to YYYY-MMM directory':                       '%yyyy-%mm/%file',
-        'Prefix parent directory with year':                '%yyyy-%dir/%file',
-        'Prefix with the file extension and camera model':  '%EXT-%{image.Model}-%file',
-        'Prefix with F-number':                             'F%{exif.FNumber}-%file',
-        'Rename using a custom function': function(filepath, data) { return 'CUSTOM-' + path.basename(filepath); }
-    };
+    examples, doge_prefixer;
 
-function ul(text, chr) {
-    chr = chr || '=';
-    return text + '\n' + _.times(text.length, function() { return chr; }).join('');
+doge_prefixer = function(fileinfo, metadata) {
+    var dogeisms = ['very', 'wow', 'so', 'much'];
+    console.log(arguments);
+    return [dogeisms[Math.floor(Math.random() * dogeisms.length)], fileinfo.basename].join('_');
 }
 
-function render(description, result) {
-    console.log(ul('EXAMPLE: ' + description));
-    console.log('template :', result.template);
-    console.log('original :', result.original.path);
-    console.log('processed:', result.processed.path);
-    console.log('');
+examples = {
+        'Prefix the filename with the date':                     '{{date}}_{{file}}',
+        'Prefix the filename with a custom date format':         '{{date "yy-mm"}}_{{file}}',
+        'Move the image to a YYYY-MM directory':                 '{{date "yyyy-mm"}}/{{file}}',
+        'Prefix the parent directory with the year':             '{{date "yyyy"}}-{{dir}}/{{file}}',
+        'Prefix the filename with the extension & camera model': '{{EXT}}-{{image.Model}}-{{file}}',
+        'Prefix the filename with the F-number':                 'F{{exif.FNumber}}-{{file}}',
+        'Rename using a custom function':                        doge_prefixer
+    };
+
+helpers.ul('DEMO: exif-renamer#process', '=', '\n');
+
+function render(title, result) {
+    helpers.ul('EXAMPLE: ' + title, '-', '\n');
+    log('template :', result.template);
+    log('original :', result.original.path);
+    log('processed:', result.processed.path);
 }
 
 // rename using string-based patterns
-console.log('');
-_.forEach(examples, function(template, description) {
-    exifRenamer.process(img, template).then(function(result) {
+Q.all(_.map(examples, function(template, description) {
+    return exifRenamer.process(img, template).then(function(result) {
         render(description, result);
     });
+})).done(function() {
+    log('');
 });
