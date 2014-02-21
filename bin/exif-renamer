@@ -1,0 +1,97 @@
+#!/usr/bin/env node
+
+var cli = require('cli'),
+    clr = require('cli-color'),
+    fs = require('fs'),
+    path = require('path'),
+    glob = require('glob'),
+    Handlebars = require('handlebars'),
+    exifRenamer = require('../lib/exif-renamer');
+
+cli.parse({
+    no_ctime:  ['c', 'do not use the ctime fallback if no EXIF data is present'],
+    dryrun:    ['d', 'run without performing filesystem changes'],
+    exif:      ['e', 'get the exif data for the specified image'],
+    filetypes: ['f', 'comma-separated list of file extensions to process (jpg and jpeg are default)', 'string'],
+    recursive: ['r', 'recursively process the specified directory'],
+    template:  ['t', 'renaming template', 'string', '{{date}}_{{file}}'],
+    watch:     ['w', 'watch the specified directory for changes and process automatically']
+});
+
+cli.main(function(args, options) {
+
+    function reporter(err, result) {
+        if (err) {
+            cli.info(err);
+        }
+        if (result) {
+            var tmpl = [
+                clr.cyan('[old] ' + '{{original.path}}'),
+                clr.green('[new] ' + '{{processed.path}}')
+            ].join('\n');
+            cli.info('image processed' + ((options.dryrun) ? ' (dry run)' : ''));
+            console.log(Handlebars.compile(tmpl)(result));
+            console.log('');
+        }
+    }
+
+    // set fallback_ctime
+    exifRenamer.config.fallback_ctime = !options.no_ctime;
+
+    // set dryrun
+    exifRenamer.config.dryrun = options.dryrun;
+
+    // set valid_extensions
+    if (options.filetypes) {
+        exifRenamer.config.valid_extensions = options.filetypes.split(/\s*\,\s*/);
+    }
+
+    // if --watch or --recursive, only use the first argument
+    if (options.watch || options.recursive) {
+        args = args.slice(0,1);
+    }
+
+    args.forEach(function(item) {
+        var p = (args[0]) ? path.resolve(item) : false,
+            exists = p && fs.existsSync(p),
+            is_dir = exists && fs.lstatSync(p).isDirectory(),
+            is_file = exists && fs.lstatSync(p).isFile(),
+            fn;
+
+        if (options.watch) {
+            if (!is_dir) {
+                return this.fatal(Handlebars.compile('the --watch option requires a valid directory')(options));
+            }
+            exifRenamer.watch(p, options.template, reporter);
+        }
+
+        else if (options.recursive) {
+            if (!is_dir) {
+                return this.fatal(Handlebars.compile('the --recursive option requires a valid directory')(options));
+            }
+            exifRenamer.rename_dir(p, options.template, reporter, true);
+        }
+
+        else if (options.exif) {
+            if (!is_file) {
+                return this.fatal(Handlebars.compile('the --exif option requires a valid file')(options));
+            }
+            exifRenamer.exif(p, function(err, exif) {
+                if (err) return this.error(err);
+                cli.info('EXIF data for ' + p);
+                console.log(exif);
+            });
+        }
+
+        else {
+            try {
+                fn = (is_dir) ? exifRenamer.rename_dir : exifRenamer.rename;
+                fn(p, options.template, reporter);
+            }
+            catch (e) {
+                this.info(Handlebars.compile('the argument "{{f}}" did not match any files')({f:f}));
+            }
+        }
+
+    }.bind(this));
+});
