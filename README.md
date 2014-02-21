@@ -69,7 +69,7 @@ Options:
 The following configuration options are available when using _exif-renamer_ as a library
 (the default values are show below):
 
-```json
+```javascript
 {
     date_format: 'yyyy-mm-dd',
     time_format: 'HH:MM:ss',
