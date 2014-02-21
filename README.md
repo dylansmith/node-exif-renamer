@@ -1,19 +1,22 @@
 # exif-renamer
 
-A NodeJS service to rename images using their EXIF data. Can be set to watch a directory
-and automatically process images copied to it.
+A NodeJS library & shell command to rename photos using their EXIF data.
+It can also be set to watch a directory and automatically process images copied to it.
 
 ## Installation
 Install the module with: `npm install exif-renamer`
 
 ## Usage
+
+### as a library
+
 First, import the module:
 
 ```javascript
 var exifRenamer = require('exif-renamer');
 ```
 
-exif-renamer supports node-style callbacks:
+_exif-renamer_ supports node-style callbacks:
 
 ```javascript
 exifRenamer.rename('path/to/image.file', '{{date "yyyy-mm-dd"}}_{{file}}', function(error, filename) {
@@ -38,11 +41,51 @@ exifRenamer
     })
     .done();
 ```
+### as a shell command
+
+```bash
+$ exif-renamer -h
+
+Usage:
+  exif-renamer [OPTIONS] [ARGS]
+
+Options:
+  -c, --no_ctime         do not use the ctime fallback if no EXIF data is present
+  -d, --dryrun           run without performing filesystem changes
+  -e, --exif             get the exif data for the specified image
+  -f, --filetypes STRING comma-separated list of file extensions to process
+                         (jpg and jpeg are default)
+  -r, --recursive        recursively process the specified directory
+  -t, --template [STRING]renaming template (Default is {{date}}_{{file}})
+  -w, --watch            watch the specified directory for changes and
+                         process automatically
+  -h, --help             Display help and usage details
+```
 
 ## Documentation
 
 ### Configuration
-Coming in a future release.
+
+The following configuration options are available when using _exif-renamer_ as a library
+(the default values are show below):
+
+```json
+{
+    date_format: 'yyyy-mm-dd',
+    time_format: 'HH:MM:ss',
+    path_separator: '/',
+    valid_extensions: ['jpg', 'jpeg'],
+    dryrun: false,
+    fallback_ctime: true
+}
+```
+
+To update configuration, do the following:
+
+```javascript
+var exifRenamer = require('exif-renamer');
+exifRenamer.config.dryrun = true;
+```
 
 ### Renaming templates
 
@@ -50,7 +93,7 @@ The #process and #rename methods accept a `template` argument which is used to d
 filename for the renamed image. As the name might suggest, the template is a way for you to format
 the filename using values present in the EXIF data.
 
-`exif-renamer` uses [Handlebars](http://handlebarsjs.com/) for templating, which allows you to
+_exif-renamer_ uses [Handlebars](http://handlebarsjs.com/) for templating, which allows you to
 easily access the image file metadata to construct just about any filename you could imagine, e.g.:
 
 > Prefix the filename with the date (defaults to YYYY-MM-DD format):<br>
@@ -74,18 +117,25 @@ easily access the image file metadata to construct just about any filename you c
 `date` (*datetime*, really) is currently the only metadata that supports additional formatting, via
 the [dateformat module](https://www.npmjs.org/package/dateformat) as mentioned above.
 
+If a template variable is used that is not found in the image metadata, it is simply ignored and an
+empty string is used as a replacement.
+
 #### Custom renaming
 
 It is possible to pass your own custom function rather than a handlebars template, giving you total
 control over the renaming process. Here is an example:
 
 ```javascript
-doge_prefixer = function(fileinfo, metadata) {
+function dogeify(fileinfo, metadata) {
     var dogeisms = ['very', 'wow', 'so', 'much'];
-    return [dogeisms[Math.floor(Math.random() * dogeisms.length)], fileinfo.basename].join('_');
-}
+    return [
+        dogeisms[Math.floor(Math.random() * dogeisms.length)],
+        'F' + metadata.exif.FNumber,
+        fileinfo.basename
+    ].join('_');
+};
 
-exifRenamer.process('path/to/image.file', doge_prefixer, function(err, result) {
+exifRenamer.process('path/to/image.file', dogeify, function(err, result) {
     //...
 });
 ```
@@ -135,10 +185,12 @@ exifRenamer.exif('path/to/image.file', function(err, exifdata) {
 });
 ```
 
+* * *
+
 #### #process
 
-Takes an image and renaming template or callback and returns an object containing the renamed
-image path, but does not actually rename the image (see #rename for this).
+Returns an object containing the renaming outcome for the specified image,
+but does not actually rename the image (see #rename for this).
 
 ##### arguments
 
@@ -160,9 +212,11 @@ exifRenamer.process('path/to/image.file', customRenamer, function(err, result) {
 });
 ```
 
+* * *
+
 #### #rename
 
-Takes an image and renaming template or callback and renames/moves the image.
+Renames/moves the specified image using the provided template/callback.
 
 ##### arguments
 
@@ -183,6 +237,36 @@ exifRenamer.rename('path/to/image.file', customRenamer, function(err, result) {
     //...
 });
 ```
+
+* * *
+
+#### #rename_dir
+
+Renames/moves all applicable images in the specified directory,  using the provided
+template/callback.
+
+##### arguments
+
+- `filepath` the path to the image file
+- `template` the renaming template or a custom callback function
+- `callback` the node-style callback that will receive the response
+- `recursive` boolean switch to enable recursive processing, defaults to false
+
+##### usage
+
+```javascript
+// using a handlebars template
+exifRenamer.rename('path/to/image.file', 'renaming-template', function(err, result) {
+    //...
+});
+
+// using a custom function
+exifRenamer.rename('path/to/image.file', customRenamer, function(err, result) {
+    //...
+});
+```
+
+* * *
 
 #### #watch
 

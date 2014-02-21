@@ -1,7 +1,7 @@
 {
   "name": "exif-renamer",
-  "description": "A NodeJS service to rename photos using their EXIF data.",
-  "version": "0.2.1",
+  "description": "A NodeJS library & shell command to rename photos using their EXIF data.",
+  "version": "0.3.0",
   "homepage": "https://github.com/dylansmith/node-exif-renamer",
   "author": {
     "name": "Dylan Smith",
@@ -20,6 +20,9 @@
       "url": "https://github.com/dylansmith/node-exif-renamer/blob/master/LICENSE-MIT"
     }
   ],
+  "bin": {
+    "exif-renamer": "./bin/exif-renamer"
+  },
   "main": "lib/exif-renamer",
   "engines": {
     "node": ">= 0.8.0"
@@ -42,6 +45,9 @@
     "watchr": "~2.4.11",
     "mkdirp": "~0.3.5",
     "string": "~1.8.0",
-    "handlebars": "~2.0.0-alpha.1"
+    "handlebars": "~2.0.0-alpha.1",
+    "cli": "~0.4.5",
+    "cli-color": "~0.2.3",
+    "glob": "~3.2.8"
   }
 }
