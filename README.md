@@ -287,10 +287,17 @@ exifRenamer.watch('path/to/watch/dir', 'renaming-template', function(err, result
 ```
 
 ## Contributing
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
+In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit
+tests for any new or changed functionality. Lint and test your code using
+[Grunt](http://gruntjs.com/).
 
 ## Release History
-0.1.0 - initial version, work in progress
+* 0.3.0 - added #rename_dir with recursive option, ctime fallback and a shell interface
+    ([commit](https://github.com/dylansmith/node-exif-renamer/commit/99607cab9eebeed56110490c1f6fc246d87479b2))
+* 0.2.0 - introduced handlebars-based templating
+    ([commit](https://github.com/dylansmith/node-exif-renamer/commit/c53a1bde6c57f86f5db9e773e15840d9f0a7f9cc))
+* 0.1.0 - initial version, work in progress
+    ([commit](https://github.com/dylansmith/node-exif-renamer/commit/3b9071facf03f5ca74bb48f75355ff8e7d132670))
 
 ## License
 Copyright (c) 2014 Dylan Smith
