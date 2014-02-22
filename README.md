@@ -144,7 +144,7 @@ function dogeify(fileinfo, metadata) {
         'F' + metadata.exif.FNumber,
         fileinfo.basename
     ].join('_');
-};
+}
 
 exifRenamer.process('path/to/image.file', dogeify, function(err, result) {
     //...
@@ -168,12 +168,14 @@ The metadata available to a handlebar template is a combination of the exif data
     extname:  <the image extension>,
 
     // other useful stuff
-    'date':   <EXIF date in YYYY-MM-DD format>,
-    'time':   <EXIF time in HH:MM:SS format>,
-    'file':   <the image filename, alias for basename>,
-    'dir':    <the image's parent directory, alias for dirname>,
-    'ext':    <the image extension, lowercased>,
-    'EXT':    <the image extension, uppercased>,
+    'datetime': <EXIF date or ctime>
+    'date':     <EXIF date in YYYY-MM-DD format>,
+    'time':     <EXIF time in HH:MM:SS format>,
+    'dir':      <the image's parent directory, alias for dirname>,
+    'file':     <the image filename, alias for basename>,
+    'name':     <the image filename, without the extension>,
+    'ext':      <the image extension, lowercased>,
+    'EXT':      <the image extension, uppercased>
 }
 ```
 

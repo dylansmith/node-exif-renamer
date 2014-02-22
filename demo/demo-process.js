@@ -1,5 +1,4 @@
-var path = require('path'),
-    _ = require('lodash'),
+var _ = require('lodash'),
     Q = require('q'),
     helpers = require('./helpers'),
     exifRenamer = require('../lib/exif-renamer');
@@ -11,7 +10,7 @@ function dogeify(fileinfo, metadata) {
         'F' + metadata.exif.FNumber,
         fileinfo.basename
     ].join('_');
-};
+}
 
 var examples = {
         'Prefix the filename with the date':                     '{{date}}_{{file}}',

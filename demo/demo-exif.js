@@ -1,5 +1,4 @@
 var exifRenamer = require('../lib/exif-renamer'),
-    path = require('path'),
     helpers = require('./helpers');
 
 helpers.ul('DEMO: exif-renamer#process', '=', '\n');
