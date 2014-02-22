@@ -4,7 +4,18 @@ A NodeJS library & shell command to rename photos using their EXIF data.
 It can also be set to watch a directory and automatically process images copied to it.
 
 ## Installation
-Install the module with: `npm install exif-renamer`
+
+To use it as a dependency in your Node project, install it locally using:
+
+```bash
+$ npm install exif-renamer --save
+```
+
+To use it as a command line tool, install it globally using: 
+
+```bash
+$ npm install exif-renamer -g
+```
 
 ## Usage
 
