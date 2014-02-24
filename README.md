@@ -3,6 +3,8 @@
 A NodeJS library & shell command to rename photos using their EXIF data.
 It can also be set to watch a directory and automatically process images copied to it.
 
+[![Gitter chat](https://badges.gitter.im/dylansmith/node-exif-renamer.png)](https://gitter.im/dylansmith/node-exif-renamer)
+
 ## Installation
 
 To use it as a dependency in your Node project, install it locally using:
@@ -11,7 +13,7 @@ To use it as a dependency in your Node project, install it locally using:
 $ npm install exif-renamer --save
 ```
 
-To use it as a command line tool, install it globally using: 
+To use it as a command line tool, install it globally using:
 
 ```bash
 $ npm install exif-renamer -g
@@ -299,10 +301,17 @@ exifRenamer.watch('path/to/watch/dir', 'renaming-template', function(err, result
 });
 ```
 
+## Support
+
+This software is free and open source and maintained by just one guy who has a day job.
+If you have a feature request or bug report please
+[open an issue on GitHub](https://github.com/dylansmith/node-exif-renamer/issues) or
+[discuss it on Gitter](https://gitter.im/dylansmith/node-exif-renamer).
+
 ## Contributing
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit
-tests for any new or changed functionality. Lint and test your code using
-[Grunt](http://gruntjs.com/).
+
+If you are a developer please feel free to get involved and send a pull request with
+your enhancements or bugfix.
 
 ## Release History
 * 0.3.0 - added #rename_dir with recursive option, ctime fallback and a shell interface
