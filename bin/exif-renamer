@@ -78,7 +78,7 @@ cli.main(function(args, options) {
 
         else if (options.exif) {
             if (!is_file) {
-                return this.fatal('the --exif option requires a valid file');
+                return cli.fatal('the --exif option requires a valid file');
             }
             exifRenamer.exif(p, function(err, exif) {
                 if (err) return cli.error(err);
@@ -89,7 +89,7 @@ cli.main(function(args, options) {
 
         else {
             if (!is_file) {
-                return this.fatal(p + ' not found');
+                return cli.fatal(p + ' not found');
             }
             try {
                 fn = (is_dir) ? exifRenamer.rename_dir : exifRenamer.rename;
