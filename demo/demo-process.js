@@ -3,25 +3,25 @@ var _ = require('lodash'),
     helpers = require('./helpers'),
     exifRenamer = require('../lib/exif-renamer');
 
-function dogeify(fileinfo, metadata) {
+function dogeify(metadata) {
     var dogeisms = ['very', 'wow', 'so', 'much'];
     return [
         dogeisms[Math.floor(Math.random() * dogeisms.length)],
         'F' + metadata.exif.FNumber,
-        fileinfo.basename
+        metadata.file
     ].join('_');
 }
 
 var examples = {
-        'Prefix the filename with the date':                     '{{date}}_{{file}}',
-        'Prefix the filename with a custom date format':         '{{date "yy-mm"}}_{{file}}',
-        'Move the image to a YYYY-MM directory':                 '{{date "yyyy-mm"}}/{{file}}',
-        'Prefix the parent directory with the year':             '{{date "yyyy"}}-{{dir}}/{{file}}',
-        'Prefix the filename with the extension & camera model': '{{EXT}}-{{image.Model}}-{{file}}',
-        'Prefix the filename with the F-number':                 'F{{exif.FNumber}}-{{file}}',
-        'Prefix with an undefined EXIF property':                '{{exif.NOPE}}-{{file}}',
-        'Rename using a custom function':                        dogeify
-    };
+    'Prefix the filename with the default datetime format':  '{{dir}}/{{datetime}}_{{file}}',
+    'Prefix the filename with a custom datetime format':     '{{dir}}/{{datetime "yy-mm"}}_{{file}}',
+    'Move the image to a "YYYY-MM" directory':               '{{dir}}/{{datetime "yyyy-mm"}}/{{file}}',
+    'Prefix the parent directory with the date':             '{{dir}}/../{{date}} {{dirname}}/{{file}}',
+    'Prefix the filename with the extension & camera model': '{{dir}}/{{EXT}}-{{image.Model}}-{{file}}',
+    'Prefix the filename with the F-number':                 '{{dir}}/F{{exif.FNumber}}-{{file}}',
+    'Prefix with an undefined EXIF property':                '{{dir}}/{{exif.NOPE}}-{{file}}',
+    'Rename using a custom function':                        dogeify
+};
 
 helpers.ul('DEMO: exif-renamer#process', '=', '\n');
 
