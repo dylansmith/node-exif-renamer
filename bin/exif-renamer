@@ -6,7 +6,7 @@ var cli = require('cli'),
     path = require('path'),
     glob = require('glob'),
     Handlebars = require('handlebars'),
-    exifRenamer = require('../lib/exif-renamer');
+    exifRenamer = require('../lib/exif-renamer')();
 
 cli.parse({
     no_ctime:  ['c', 'do not use the ctime fallback if no EXIF data is present'],
@@ -15,7 +15,7 @@ cli.parse({
     filetypes: ['f', 'comma-separated list of file extensions to process (jpg and jpeg are default)', 'string'],
     overwrite: ['o', 'overwrite existing files'],
     recursive: ['r', 'recursively process the specified directory'],
-    template:  ['t', 'renaming template', 'string', '{{dir}}/{{date}}_{{file}}'],
+    template:  ['t', 'renaming template', 'string', '{{dir}}/{{datetime}}_{{file}}'],
     watch:     ['w', 'watch the specified directory for changes and process automatically']
 });
 
@@ -66,6 +66,7 @@ cli.main(function(args, options) {
             if (!is_dir) {
                 return cli.fatal('the --watch option requires a valid directory');
             }
+            cli.info('watching directory: ' + p);
             exifRenamer.watch(p, options.template, reporter);
         }
 

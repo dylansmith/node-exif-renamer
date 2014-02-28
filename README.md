@@ -23,37 +23,14 @@ $ npm install exif-renamer -g
 
 ### as a library
 
-First, import the module:
-
 ```javascript
-var exifRenamer = require('exif-renamer');
-```
+var exifRenamer = require('exif-renamer')(opts);
 
-_exif-renamer_ supports node-style callbacks:
-
-```javascript
-exifRenamer.rename('path/to/image.file', '{{date "yyyy-mm-dd"}}_{{file}}', function(error, filename) {
-    if (!error) {
-        console.log('the file was renamed: ', filename);
-    } else {
-        console.log('an error occurred', error);
-    }
+exifRenamer.rename('path/to/image.file', '{{dir}}/{{datetime "yyyy-mm-dd"}}_{{file}}', function(err, result) {
+    console.log((err) ? err : 'the file was renamed: ', result.processed.path);
 });
 ```
 
-It also supports promises (using the [Q library](https://www.npmjs.org/package/q)):
-
-```javascript
-exifRenamer
-    .rename('path/to/image.file', '{{date "yyyy-mm-dd"}}_{{file}}')
-    .then(function(filename) {
-        console.log('the file was renamed: ', filename);
-    })
-    .catch(function(error) {
-        console.log('an error occurred', error);
-    })
-    .done();
-```
 ### as a shell command
 
 ```bash
@@ -70,7 +47,7 @@ Options:
                          (jpg and jpeg are default)
   -o, --overwrite        overwrite existing files
   -r, --recursive        recursively process the specified directory
-  -t, --template [STRING]renaming template (Default is {{dir}}/{{date}}_{{file}})
+  -t, --template [STRING]renaming template (Default is {{dir}}/{{datetime}}_{{file}})
   -w, --watch            watch the specified directory for changes and
                          process automatically
   -h, --help             Display help and usage details
@@ -85,17 +62,18 @@ The following configuration options are available when using _exif-renamer_ as a
 
 ```javascript
 {
-    dryrun: false,                      // simulate processing without modifying the filesystem?
-    fallback_ctime: true,               // fallback to filesystem ctime if no DateTimeOriginal in EXIF?
-    overwrite: false,                   // overwrite existing files?
-    path_separator: '/',                // the character used to separate paths in templates
+    dryrun: false,                          // simulate processing without modifying the filesystem
+    fallback_ctime: true,                   // fallback to filesystem ctime if no EXIF DateTimeOriginal
+    overwrite: false,                       // overwrite existing files?
+    require_exif: true,                     // fail if EXIF data is not found?
+    path_separator: '/',                    // the character used to separate paths in templates
     formats: {
-        datetime: 'yyyymmdd-HHMMss',    // default formatting for {{datetime}}
-        date: 'yyyymmdd',               // default formatting for {{date}}
-        time: 'HHMMss'                  // default formatting for {{time}}
+        datetime: 'yyyymmdd-HHMMss',        // default formatting for {{datetime}}
+        date: 'yyyymmdd',                   // default formatting for {{date}}
+        time: 'HHMMss'                      // default formatting for {{time}}
     },
-    valid_extensions: ['jpg', 'jpeg']   // supported file extensions for processing
-}
+    valid_extensions: ['jpg','jpeg','tiff'] // supported file extensions for processing
+};
 ```
 
 To update configuration, do the following:
@@ -273,8 +251,8 @@ template/callback.
 
 - `filepath` the path to the image file
 - `template` the renaming template or a custom callback function
+- `[recursive=false]` boolean switch to enable recursive processing, defaults to false
 - `callback` the node-style callback that will receive the response
-- `recursive` boolean switch to enable recursive processing, defaults to false
 
 ##### usage
 
@@ -300,7 +278,7 @@ Watches a specified directory, renaming all images that are added to that direct
 
 - `dirpath`  the path to the watch directory
 - `template` the renaming template or a custom callback function
-- `callback` the node-style callback that will receive the response
+- `callback` the node-style callback that will be called each time a file is detected & processed
 
 ##### usage
 
@@ -323,13 +301,18 @@ If you are a developer please feel free to get involved and send a pull request 
 your enhancements or bugfix.
 
 ## Release History
+* 0.5.0
+  * added mocha specs with instanbul coverage reports
+  * altered some method signatures
+  * methods are no longer wrapped with Q internally
+  * much refactor, so bugfix, wow
 * 0.4.0 - added explicit template pathing (breaking changes), overwrite protection, and refactoring
 * 0.3.0 - added #rename_dir with recursive option, ctime fallback and a shell interface
-    ([commit](https://github.com/dylansmith/node-exif-renamer/commit/99607cab9eebeed56110490c1f6fc246d87479b2))
+  ([commit](https://github.com/dylansmith/node-exif-renamer/commit/99607cab9eebeed56110490c1f6fc246d87479b2))
 * 0.2.0 - introduced handlebars-based templating
-    ([commit](https://github.com/dylansmith/node-exif-renamer/commit/c53a1bde6c57f86f5db9e773e15840d9f0a7f9cc))
+  ([commit](https://github.com/dylansmith/node-exif-renamer/commit/c53a1bde6c57f86f5db9e773e15840d9f0a7f9cc))
 * 0.1.0 - initial version, work in progress
-    ([commit](https://github.com/dylansmith/node-exif-renamer/commit/3b9071facf03f5ca74bb48f75355ff8e7d132670))
+  ([commit](https://github.com/dylansmith/node-exif-renamer/commit/3b9071facf03f5ca74bb48f75355ff8e7d132670))
 
 ## License
 Copyright (c) 2014 Dylan Smith

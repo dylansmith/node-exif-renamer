@@ -1,7 +1,7 @@
 var _ = require('lodash'),
     Q = require('q'),
     helpers = require('./helpers'),
-    exifRenamer = require('../lib/exif-renamer');
+    exifRenamer = require('../lib/exif-renamer')();
 
 function dogeify(metadata) {
     var dogeisms = ['very', 'wow', 'so', 'much'];
@@ -34,7 +34,7 @@ function render(title, result) {
 
 // rename using string-based patterns
 Q.all(_.map(examples, function(template, description) {
-    return exifRenamer.process(helpers.test_img, template).then(function(result) {
+    return exifRenamer.process(helpers.test_img, template, function(err, result) {
         render(description, result);
     });
 })).done(function() {

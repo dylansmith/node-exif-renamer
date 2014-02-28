@@ -1,7 +1,7 @@
 var path = require('path'),
     fs = require('fs'),
     helpers = require('./helpers'),
-    exifRenamer = require('../lib/exif-renamer'),
+    exifRenamer = require('../lib/exif-renamer')(),
     watch_dir = path.resolve(__dirname, 'watch'),
     stdin = process.openStdin();
 
@@ -22,7 +22,7 @@ exifRenamer.watch(watch_dir, '{{dir}}/processed/{{file}}', function(err, result)
 
 // create file every time the Enter key is pressed
 stdin.on('data', function() {
-    var target_file = path.join(watch_dir, 'test.jpg');
+    var target_file = path.join(watch_dir, Date.now() + '_test.jpg');
     console.log('[exif-renamer] creating: ' + target_file);
     fs.createReadStream(helpers.test_img).pipe(fs.createWriteStream(target_file));
 });
