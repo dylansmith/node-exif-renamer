@@ -13,13 +13,13 @@ function dogeify(metadata) {
 }
 
 var examples = {
-    'Prefix the filename with the default datetime format':  '{{dir}}/{{datetime}}_{{file}}',
-    'Prefix the filename with a custom datetime format':     '{{dir}}/{{datetime "yy-mm"}}_{{file}}',
-    'Move the image to a "YYYY-MM" directory':               '{{dir}}/{{datetime "yyyy-mm"}}/{{file}}',
-    'Prefix the parent directory with the date':             '{{dir}}/../{{date}} {{dirname}}/{{file}}',
-    'Prefix the filename with the extension & camera model': '{{dir}}/{{EXT}}-{{image.Model}}-{{file}}',
-    'Prefix the filename with the F-number':                 '{{dir}}/F{{exif.FNumber}}-{{file}}',
-    'Prefix with an undefined EXIF property':                '{{dir}}/{{exif.NOPE}}-{{file}}',
+    'Prefix the filename with the default datetime format':  '{{datetime}}_{{file}}',
+    'Prefix the filename with a custom datetime format':     '{{datetime "yy-mm"}}_{{file}}',
+    'Move the image to a "YYYY-MM" directory':               './{{datetime "yyyy-mm"}}:{{file}}',
+    'Prefix the parent directory with the date':             '../{{date}} {{dirname}}:{{file}}',
+    'Prefix the filename with the extension & camera model': '{{EXT}}-{{image.Model}}-{{file}}',
+    'Prefix the filename with the F-number':                 'F{{exif.FNumber}}-{{file}}',
+    'Prefix with an undefined EXIF property':                '{{exif.NOPE}}-{{file}}',
     'Rename using a custom function':                        dogeify
 };
 

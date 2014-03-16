@@ -9,7 +9,7 @@ helpers.ul('DEMO: exif-renamer#watch', '=', '\n');
 console.log(helpers.clr.yellow('Press <Enter> to trigger file creation in the watch directory...'));
 
 // watch the target dir for new images and rename them
-exifRenamer.watch(watch_dir, '{{dir}}/processed/{{file}}', function(err, result) {
+exifRenamer.watch(watch_dir, 'processed/:{{file}}', function(err, result) {
     if (err) {
         helpers.cli.error(err);
     }

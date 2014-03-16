@@ -15,7 +15,7 @@ cli.parse({
     filetypes: ['f', 'comma-separated list of file extensions to process (jpg and jpeg are default)', 'string'],
     overwrite: ['o', 'overwrite existing files'],
     recursive: ['r', 'recursively process the specified directory'],
-    template:  ['t', 'renaming template', 'string', '{{dir}}/{{datetime}}_{{file}}'],
+    template:  ['t', 'renaming template', 'string', '{{datetime}}_{{file}}'],
     watch:     ['w', 'watch the specified directory for changes and process automatically']
 });
 

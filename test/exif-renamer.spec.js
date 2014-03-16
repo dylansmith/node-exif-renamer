@@ -7,8 +7,9 @@ should;
 var path = require('path'),
     fs = require('fs'),
     Q = require('q'),
+    _ = require('lodash'),
     dateformat = require('dateformat'),
-    template = '{{dir}}/{{datetime}}_{{file}}',
+    template = '{{datetime}}_{{file}}',
     imgPath = path.resolve(__dirname, '../demo/img'),
     imgExif = path.join(imgPath, 'exif.jpg'),
     imgNoExif = path.join(imgPath, 'no_exif.jpg'),
@@ -215,12 +216,61 @@ describe('exif-renamer', function() {
 
         it('should format datetime correctly', function(done) {
             var format = 'yy_mm_dd_HH_MM_ss';
-            exifRenamer.process(imgExif, '{{dir}}/{{datetime "'+format+'"}}', function(err, result) {
+            exifRenamer.process(imgExif, '{{dir}}:{{datetime "'+format+'"}}', function(err, result) {
                 err.should.be.false;
                 var datetime = result.original.datetime;
                 result.processed.name.should.equal(dateformat(datetime, format));
                 done();
             });
+        });
+
+        it('should calculate target paths correctly', function(done) {
+            var srcDir = path.dirname(imgExif),
+                name = path.basename(imgExif),
+                parent = path.join(path.dirname(srcDir), name),
+                sibling = path.join(path.dirname(srcDir), 'test', name),
+                abs = path.join('/foo/bar', name),
+                promises = [],
+                examples = {
+                    // empty = src
+                    '{{file}}': imgExif,
+                    ':{{file}}': imgExif,
+                    // relative src
+                    '.:{{file}}': imgExif,
+                    './:{{file}}': imgExif,
+                    // absolute + relative src
+                    '{{dir}}/.:{{file}}': imgExif,
+                    '{{dir}}/./:{{file}}': imgExif,
+                    // relative parent
+                    '..:{{file}}': parent,
+                    '../:{{file}}': parent,
+                    // absolute + relative parent
+                    '{{dir}}/..:{{file}}': parent,
+                    '{{dir}}/../:{{file}}': parent,
+                    // relative sibling
+                    '../test:{{file}}': sibling,
+                    '../test/:{{file}}': sibling,
+                    // absolute + relative sibling
+                    '{{dir}}/../test:{{file}}': sibling,
+                    '{{dir}}/../test/:{{file}}': sibling,
+                    // absolute other
+                    '/foo/bar:{{file}}': abs,
+                    '/foo/bar/:{{file}}': abs
+                };
+
+            promises = _.map(examples, function(path, template) {
+                return Q.nfcall(exifRenamer.process.bind(exifRenamer), imgExif, template);
+            });
+
+            Q.allSettled(promises)
+            .then(function(results) {
+                results.forEach(function(result) {
+                    var expectedPath = examples[result.value.template];
+                    result.value.processed.path.should.equal(expectedPath);
+                });
+                done();
+            })
+            .catch(done);
         });
 
     });
@@ -257,7 +307,7 @@ describe('exif-renamer', function() {
 
         it('should not overwrite files', function(done) {
             exifRenamer.config.overwrite.should.be.false;
-            exifRenamer.rename(tmpExif, tmpExif, function(err) {
+            exifRenamer.rename(tmpExif, '{{file}}', function(err) {
                 err.should.be.an.instanceOf(Error);
                 done();
             });
@@ -270,7 +320,7 @@ describe('exif-renamer', function() {
                 fs.existsSync(targetPath).should.be.true;
                 // rename to existing path
                 exifRenamer.config.overwrite = true;
-                exifRenamer.rename(tmpExif, '{{dir}}/target.jpg', function(err, result) {
+                exifRenamer.rename(tmpExif, '{{dir}}:target.jpg', function(err, result) {
                     err.should.be.false;
                     result.processed.path.should.equal(targetPath);
                     fs.existsSync(targetPath).should.be.true;
@@ -282,7 +332,7 @@ describe('exif-renamer', function() {
 
         it('should not overwrite directories, regardless of configuration', function(done) {
             exifRenamer.config.overwrite = true;
-            exifRenamer.rename(tmpExif, '{{dir}}', function(err) {
+            exifRenamer.rename(tmpExif, '{{dir}}:', function(err) {
                 err.should.be.an.instanceOf(Error);
                 done();
             });
@@ -291,7 +341,7 @@ describe('exif-renamer', function() {
         it('should create necessary parent paths', function(done) {
             var noPath = path.join(tmpDir, 'nopath');
             fs.existsSync(noPath).should.be.false;
-            exifRenamer.rename(tmpExif, '{{dir}}/nopath/{{file}}', function(err, result) {
+            exifRenamer.rename(tmpExif, './nopath:{{file}}', function(err, result) {
                 err.should.be.false;
                 fs.existsSync(noPath).should.be.true;
                 path.join(noPath, path.basename(tmpExif)).should.equal(result.processed.path);
@@ -411,9 +461,9 @@ describe('exif-renamer', function() {
                 from = path.join(watchDir, file),
                 to = path.join(watchDir, 'processed', file);
 
-            this.timeout(10000);
+            this.timeout(15000);
 
-            exifRenamer.watch(watchDir, '{{dir}}/processed/{{file}}', function() {
+            exifRenamer.watch(watchDir, '{{dir}}/processed:{{file}}', function() {
                 fs.existsSync(from).should.be.false;
                 fs.existsSync(to).should.be.true;
                 done();

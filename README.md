@@ -26,7 +26,7 @@ $ npm install exif-renamer -g
 ```javascript
 var exifRenamer = require('exif-renamer')(opts);
 
-exifRenamer.rename('path/to/image.file', '{{dir}}/{{datetime "yyyy-mm-dd"}}_{{file}}', function(err, result) {
+exifRenamer.rename('path/to/image.file', '{{datetime "yyyy-mm-dd"}}_{{file}}', function(err, result) {
     console.log((err) ? err : 'the file was renamed: ', result.processed.path);
 });
 ```
@@ -47,7 +47,7 @@ Options:
                          (jpg and jpeg are default)
   -o, --overwrite        overwrite existing files
   -r, --recursive        recursively process the specified directory
-  -t, --template [STRING]renaming template (Default is {{dir}}/{{datetime}}_{{file}})
+  -t, --template [STRING]renaming template (Default is {{datetime}}_{{file}})
   -w, --watch            watch the specified directory for changes and
                          process automatically
   -h, --help             Display help and usage details
@@ -93,28 +93,28 @@ _exif-renamer_ uses [Handlebars](http://handlebarsjs.com/) for templating, which
 easily access the image file metadata to construct just about any filename you could imagine, e.g.:
 
 > Prefix the filename with the default datetime format:<br>
-> `{{dir}}/{{datetime}}_{{file}}`
+> `{{datetime}}_{{file}}`
 
 > Prefix the filename with a custom datetime format (see [dateformat](https://www.npmjs.org/package/dateformat)):<br>
-> `{{dir}}/{{datetime "yy-mm"}}_{{file}}`
+> `{{datetime "yy-mm"}}_{{file}}`
 
 > Move the image to a "YYYY-MM" directory:<br>
-> `{{dir}}/{{datetime "yyyy-mm"}}/{{file}}`
+> `./{{datetime "yyyy-mm"}}:{{file}}`
 
 > Prefix the parent directory with the date:<br>
-> `{{dir}}/../{{date}} {{dirname}}/{{file}}`
+> `../{{date}} {{dirname}}:{{file}}`
 
 > Prefix the filename with the file extension and camera model:<br>
-> `{{dir}}/{{EXT}}-{{image.Model}}-{{file}}`
+> `{{EXT}}-{{image.Model}}-{{file}}`
 
 > Prefix the filename with the F-number:<br>
-> `{{dir}}/F{{exif.FNumber}}-{{file}}`
+> `F{{exif.FNumber}}-{{file}}`
 
 Some things to point out:
 
-- The library makes no assumptions about the target directory, so it must be specified in the
-  template. You can use `{{dir}}` to refer to the directory of the source image, as shown in the
-  examples above.
+- The renaming pattern has the format `[<directory_pattern>:]<filename_pattern>`, where
+  `<directory_pattern>` is optional and defaults to the image's current directory.
+  Absolute or relative paths can be used in the template.
 - `{{datetime}}` is currently the only metadata that supports additional formatting, via the
   [dateformat module](https://www.npmjs.org/package/dateformat) as mentioned above.
 - if a template variable is used that is not found in the image metadata, it is simply ignored and
@@ -288,6 +288,8 @@ exifRenamer.watch('path/to/watch/dir', 'renaming-template', function(err, result
 });
 ```
 
+* * *
+
 ## Support
 
 This software is free and open source and maintained by just one guy who has a day job.
@@ -301,6 +303,13 @@ If you are a developer please feel free to get involved and send a pull request 
 your enhancements or bugfix.
 
 ## Release History
+* 0.6.0
+  * changed the way the target directory is specified in renaming templates, since the current
+    approach flattens relative paths when doing recursive renaming. The renaming template now
+    requires the directory and filename to be separated by a colon, e.g.:
+    `[<directory_template>:]<filename_template>` (the directory is optional and defaults
+    to the source image's directory).
+  * Added TIFF support by default
 * 0.5.0
   * added mocha specs with instanbul coverage reports
   * altered some method signatures
