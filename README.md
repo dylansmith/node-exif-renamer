@@ -303,6 +303,8 @@ If you are a developer please feel free to get involved and send a pull request 
 your enhancements or bugfix.
 
 ## Release History
+* 0.6.1
+  * fixed https://github.com/dylansmith/node-exif-renamer/issues/1
 * 0.6.0
   * changed the way the target directory is specified in renaming templates, since the current
     approach flattens relative paths when doing recursive renaming. The renaming template now

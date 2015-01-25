@@ -4,6 +4,7 @@ var cli = require('cli'),
     clr = require('cli-color'),
     fs = require('fs'),
     path = require('path'),
+    _ = require('lodash'),
     glob = require('glob'),
     Handlebars = require('handlebars'),
     exifRenamer = require('../lib/exif-renamer')();
@@ -21,18 +22,20 @@ cli.parse({
 
 cli.main(function(args, options) {
 
-    function reporter(err, result) {
+    function reporter(err, results) {
         if (err) {
             cli.error(err);
         }
-        else if (result) {
+        else if (results) {
+            results = (_.isArray(results)) ? results : [results];
             var tmpl = [
                 clr.cyan('[old] ' + '{{original.path}}'),
-                clr.green('[new] ' + '{{processed.path}}')
+                clr.green('[new] ' + '{{processed.path}}\n')
             ].join('\n');
-            cli.info((options.dryrun) ? 'dry run ' : 'image renamed');
-            console.log(Handlebars.compile(tmpl)(result));
-            console.log('');
+            results.forEach(function(result) {
+                cli.info((options.dryrun) ? 'dry run ' : 'image renamed');
+                console.log(Handlebars.compile(tmpl)(result));
+            });
         }
     }
 
@@ -74,7 +77,7 @@ cli.main(function(args, options) {
             if (!is_dir) {
                 return cli.fatal('the --recursive option requires a valid directory');
             }
-            exifRenamer.rename_dir(p, options.template, reporter, true);
+            exifRenamer.rename_dir(p, options.template, true, reporter);
         }
 
         else if (options.exif) {
