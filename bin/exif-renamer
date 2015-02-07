@@ -26,17 +26,20 @@ cli.main(function(args, options) {
         if (err) {
             cli.error(err);
         }
-        else if (results) {
-            results = (_.isArray(results)) ? results : [results];
-            var tmpl = [
-                clr.cyan('[old] ' + '{{original.path}}'),
-                clr.green('[new] ' + '{{processed.path}}\n')
-            ].join('\n');
-            results.forEach(function(result) {
-                cli.info((options.dryrun) ? 'dry run ' : 'image renamed');
+        results = (_.isArray(results)) ? results : [results];
+        var tmpl = [
+            clr.cyan('[old] ' + '{{original.path}}'),
+            clr.green('[new] ' + '{{processed.path}}\n')
+        ].join('\n');
+        results.forEach(function(result) {
+            if (result.error) {
+                cli.error(result.error);
+            }
+            else {
+                cli.info(result.status);
                 console.log(Handlebars.compile(tmpl)(result));
-            });
-        }
+            }
+        });
     }
 
     // set fallback_ctime
@@ -58,12 +61,24 @@ cli.main(function(args, options) {
         args = args.slice(0,1);
     }
 
-    args.forEach(function(item) {
-        var p = (args[0]) ? path.resolve(item) : false,
-            exists = p && fs.existsSync(p),
+    // resolve globbed arguments into an array of paths
+    var paths = [];
+    args.forEach(function(p) {
+        paths = paths.concat(glob.sync(p));
+    });
+    // remove dupes and resolve paths
+    paths = _(paths).uniq().map(function(p) {
+        return path.resolve(p);
+    }).value();
+
+    if (!paths.length) {
+        console.log(Handlebars.compile('"{{args}}" did not match any files or directories')({args: args.join(' ')}));
+    }
+
+    paths.forEach(function(p) {
+        var exists = p && fs.existsSync(p),
             is_dir = exists && fs.lstatSync(p).isDirectory(),
-            is_file = exists && fs.lstatSync(p).isFile(),
-            fn;
+            is_file = exists && fs.lstatSync(p).isFile();
 
         if (options.watch) {
             if (!is_dir) {
@@ -92,14 +107,20 @@ cli.main(function(args, options) {
         }
 
         else {
-            if (!is_file) {
-                return cli.fatal(p + ' not found');
-            }
             try {
-                fn = (is_dir) ? exifRenamer.rename_dir : exifRenamer.rename;
-                fn(p, options.template, reporter);
+                if (is_dir) {
+                    cli.info('Processing directory: ' + p);
+                    exifRenamer.rename_dir(p, options.template, reporter);
+                }
+                else if (is_file) {
+                    exifRenamer.rename(p, options.template, reporter);
+                }
+                else if (!is_file) {
+                    return cli.fatal(p + ' not found');
+                }
             }
             catch (e) {
+                console.log(e);
                 cli.info(Handlebars.compile('the argument "{{f}}" did not match any files')({f:f}));
             }
         }
