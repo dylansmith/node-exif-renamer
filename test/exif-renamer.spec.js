@@ -154,7 +154,17 @@ describe('exif-renamer', function() {
             });
         });
 
-        it('should raise an error if filepath has no EXIF data', function(done) {
+        it('should raise an error if filepath has no EXIF data when config.require_exif=true', function(done) {
+            exifRenamer.config.require_exif = true;
+            exifRenamer.process(imgNoExif, template, function(err) {
+                err.should.be.an.instanceOf(Error);
+                done();
+            });
+        });
+
+        it('should raise an error if filepath has no EXIF data when config.require_exif=false and config.fallback_ctime=false', function(done) {
+            exifRenamer.config.require_exif = false;
+            exifRenamer.config.fallback_ctime = false;
             exifRenamer.process(imgNoExif, template, function(err) {
                 err.should.be.an.instanceOf(Error);
                 done();
@@ -199,7 +209,6 @@ describe('exif-renamer', function() {
             exifRenamer.config.ctime_fallback = true;
             exifRenamer.config.require_exif = false;
             exifRenamer.process(imgNoExif, template, function(err, result) {
-                result.original.exif.should.eql({});
                 result.original.datetime.should.eql(result.original.stat.ctime);
                 done();
             });

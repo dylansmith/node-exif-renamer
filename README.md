@@ -41,6 +41,7 @@ Usage:
 
 Options:
   -c, --no_ctime         do not use the ctime fallback if no EXIF data is present
+                         (also sets require_exif=true)
   -d, --dryrun           run without performing filesystem changes
   -e, --exif             get the exif data for the specified image
   -f, --filetypes STRING comma-separated list of file extensions to process
@@ -65,7 +66,7 @@ The following configuration options are available when using _exif-renamer_ as a
     dryrun: false,                          // simulate processing without modifying the filesystem
     fallback_ctime: true,                   // fallback to filesystem ctime if no EXIF DateTimeOriginal
     overwrite: false,                       // overwrite existing files?
-    require_exif: true,                     // fail if EXIF data is not found?
+    require_exif: false,                    // fail if EXIF data is not found?
     path_separator: '/',                    // the character used to separate paths in templates
     formats: {
         datetime: 'yyyymmdd-HHMMss',        // default formatting for {{datetime}}
@@ -310,6 +311,9 @@ your enhancements or bugfix.
     parsing (#5). This does however change the structure of the metadata object used in
     templating (all EXIF tag values now exist within the `exif` and `gps` keys only).
   * Improved logging and error handling (#4)
+  * `require_exif` config option now defaults to false
+  * `-c` cli switch will now also set `require_exif` to true
+  * improved readability of cli output reporter
 * 0.6.1
   * fixed https://github.com/dylansmith/node-exif-renamer/issues/1
 * 0.6.0
