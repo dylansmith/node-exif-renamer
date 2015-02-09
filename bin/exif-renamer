@@ -32,7 +32,7 @@ cli.main(function(args, options) {
             clr.white(' ➔ '),
             clr.green('{{processed.path}}'),
             clr.redBright('{{error.message}}'),
-            '{{/results}}'
+            '\n{{/results}}'
         ].join('');
         console.log(Handlebars.compile(tmpl)({results: results}));
     }
