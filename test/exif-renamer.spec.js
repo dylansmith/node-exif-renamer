@@ -8,6 +8,7 @@ var path = require('path'),
     fs = require('fs'),
     Q = require('q'),
     _ = require('lodash'),
+    sinon = require('sinon'),
     dateformat = require('dateformat'),
     template = '{{datetime}}_{{file}}',
     imgPath = path.resolve(__dirname, '../demo/img'),
@@ -362,7 +363,7 @@ describe('exif-renamer', function() {
     });
 
     /**
-     * #rename_dir(dirpath, template, callback, ignore_errors)
+     * #rename_dir(dirpath, template [recursive=false, callback, itemCallback])
      */
     describe('#rename_dir', function() {
 
@@ -408,7 +409,24 @@ describe('exif-renamer', function() {
             });
         });
 
-        it('should rename all files in the source directory only', function(done) {
+        it('should return a promise', function() {
+            var p = exifRenamer.rename_dir(tmpFromDir, template, _.noop);
+            Q.isPromise(p).should.be.true;
+        });
+
+        it('should call the itemCallback for each file and the final callback once', function(done) {
+            var itemCallback = sinon.spy(),
+                callback = sinon.stub();
+
+            exifRenamer.rename_dir(tmpFromDir, template, callback, itemCallback).then(function(results) {
+                results.length.should.eql(imgs.length * 3);
+                itemCallback.callCount.should.eql(imgs.length * 3);
+                callback.callCount.should.eql(1);
+                done();
+            });
+        });
+
+        it('should rename all files in the source directory only when recursive=false', function(done) {
             exifRenamer.rename_dir(tmpFromDir, template, function(err, results) {
                 err.should.be.false;
                 results.length.should.equal(imgs.length * 3);

@@ -22,19 +22,16 @@ cli.parse({
 
 cli.main(function(args, options) {
 
-    function reporter(err, results) {
-        results = results || err.result;
-        results = (_.isArray(results)) ? results : [results];
+    function reporter(err, result) {
+        result = result || err.result;
         var tmpl = [
-            '{{#results}}',
             clr.cyan('{{#config.dryrun}}[dryrun] {{/config.dryrun}}'),
-            clr.white('{{original.path}}'),
+            clr.white('{{{original.path}}}'),
             clr.white(' ➔ '),
-            clr.green('{{processed.path}}'),
-            clr.redBright('{{error.message}}'),
-            '\n{{/results}}'
+            clr.green('{{{processed.path}}}'),
+            clr.redBright('{{{error.message}}}'),
         ].join('');
-        console.log(Handlebars.compile(tmpl)({results: results}));
+        console.log(Handlebars.compile(tmpl)(result));
     }
 
     // set fallback_ctime and require_exif
@@ -90,7 +87,7 @@ cli.main(function(args, options) {
             if (!is_dir) {
                 return cli.fatal('the --recursive option requires a valid directory');
             }
-            exifRenamer.rename_dir(p, options.template, true, reporter);
+            exifRenamer.rename_dir(p, options.template, true, _.noop, reporter);
         }
 
         else if (options.exif) {
@@ -108,7 +105,7 @@ cli.main(function(args, options) {
             try {
                 if (is_dir) {
                     cli.info('Processing directory: ' + p);
-                    exifRenamer.rename_dir(p, options.template, reporter);
+                    exifRenamer.rename_dir(p, options.template, _.noop, reporter);
                 }
                 else if (is_file) {
                     exifRenamer.rename(p, options.template, reporter);

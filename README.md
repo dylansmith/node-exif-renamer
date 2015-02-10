@@ -254,7 +254,8 @@ template/callback.
 - `filepath` the path to the image file
 - `template` the renaming template or a custom callback function
 - `[recursive=false]` boolean switch to enable recursive processing, defaults to false
-- `callback` the node-style callback that will receive the response
+- `callback` the node-style callback called once all files have been processed
+- `itemCallback` the node-style callback called after each file is processed
 
 ##### usage
 
@@ -306,14 +307,19 @@ your enhancements or bugfix.
 
 ## Release History
 * 0.7.0
-  * Replaced the EXIF parsing library from [exif](https://www.npmjs.com/package/exif) to
-    [exif-parser](https://www.npmjs.com/package/exif-parser) to fix issues with date
-    parsing (#5). This does however change the structure of the metadata object used in
-    templating (all EXIF tag values now exist within the `exif` and `gps` keys only).
-  * Improved logging and error handling (#4)
-  * `require_exif` config option now defaults to false
-  * `-c` cli switch will now also set `require_exif` to true
-  * improved readability of cli output reporter
+  * Fixed [#3](https://github.com/dylansmith/node-exif-renamer/issues/3):
+    * `#rename_dir` now takes an `itemCallback` which is called after each file is processed
+  * Fixed [#4](https://github.com/dylansmith/node-exif-renamer/issues/4):
+    * Improved logging and error handling
+    * improved readability of cli output reporter
+  * Fixed [#5](https://github.com/dylansmith/node-exif-renamer/issues/5):
+    * Replaced the EXIF parsing library from [exif](https://www.npmjs.com/package/exif) to
+      [exif-parser](https://www.npmjs.com/package/exif-parser) to fix issues with date
+      parsing. This does however change the structure of the metadata object used in
+      templating (all EXIF tag values now exist within the `exif` and `gps` keys only).
+  * Other improvements:
+    * `require_exif` config option now defaults to false
+    * `-c` cli switch will now also set `require_exif` to true
 * 0.6.1
   * fixed https://github.com/dylansmith/node-exif-renamer/issues/1
 * 0.6.0
