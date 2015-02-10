@@ -10,7 +10,7 @@ var cli = require('cli'),
     exifRenamer = require('../lib/exif-renamer')();
 
 cli.parse({
-    no_ctime:  ['c', 'do not use the ctime fallback if no EXIF data is present'],
+    no_ctime:  ['c', 'do not use the ctime fallback if no EXIF data is present (also sets require_exif=true)'],
     dryrun:    ['d', 'run without performing filesystem changes'],
     exif:      ['e', 'get the exif data for the specified image'],
     filetypes: ['f', 'comma-separated list of file extensions to process (jpg and jpeg are default)', 'string'],
@@ -22,25 +22,23 @@ cli.parse({
 
 cli.main(function(args, options) {
 
-    function reporter(err, results) {
-        if (err) {
-            cli.error(err);
-        }
-        else if (results) {
-            results = (_.isArray(results)) ? results : [results];
-            var tmpl = [
-                clr.cyan('[old] ' + '{{original.path}}'),
-                clr.green('[new] ' + '{{processed.path}}\n')
-            ].join('\n');
-            results.forEach(function(result) {
-                cli.info((options.dryrun) ? 'dry run ' : 'image renamed');
-                console.log(Handlebars.compile(tmpl)(result));
-            });
-        }
+    function reporter(err, result) {
+        result = result || err.result;
+        var tmpl = [
+            clr.cyan('{{#config.dryrun}}[dryrun] {{/config.dryrun}}'),
+            clr.white('{{{original.path}}}'),
+            clr.white(' ➔ '),
+            clr.green('{{{processed.path}}}'),
+            clr.redBright('{{{error.message}}}'),
+        ].join('');
+        console.log(Handlebars.compile(tmpl)(result));
     }
 
-    // set fallback_ctime
+    // set fallback_ctime and require_exif
     exifRenamer.config.fallback_ctime = !options.no_ctime;
+    if (options.no_ctime === true) {
+        exifRenamer.config.require_exif = true;
+    }
 
     // set dryrun
     exifRenamer.config.dryrun = options.dryrun;
@@ -58,12 +56,24 @@ cli.main(function(args, options) {
         args = args.slice(0,1);
     }
 
-    args.forEach(function(item) {
-        var p = (args[0]) ? path.resolve(item) : false,
-            exists = p && fs.existsSync(p),
+    // resolve globbed arguments into an array of paths
+    var paths = [];
+    args.forEach(function(p) {
+        paths = paths.concat(glob.sync(p));
+    });
+    // remove dupes and resolve paths
+    paths = _(paths).uniq().map(function(p) {
+        return path.resolve(p);
+    }).value();
+
+    if (!paths.length) {
+        cli.error(Handlebars.compile('"{{args}}" did not match any files or directories')({args: args.join(' ')}));
+    }
+
+    paths.forEach(function(p) {
+        var exists = p && fs.existsSync(p),
             is_dir = exists && fs.lstatSync(p).isDirectory(),
-            is_file = exists && fs.lstatSync(p).isFile(),
-            fn;
+            is_file = exists && fs.lstatSync(p).isFile();
 
         if (options.watch) {
             if (!is_dir) {
@@ -77,7 +87,7 @@ cli.main(function(args, options) {
             if (!is_dir) {
                 return cli.fatal('the --recursive option requires a valid directory');
             }
-            exifRenamer.rename_dir(p, options.template, true, reporter);
+            exifRenamer.rename_dir(p, options.template, true, _.noop, reporter);
         }
 
         else if (options.exif) {
@@ -92,14 +102,20 @@ cli.main(function(args, options) {
         }
 
         else {
-            if (!is_file) {
-                return cli.fatal(p + ' not found');
-            }
             try {
-                fn = (is_dir) ? exifRenamer.rename_dir : exifRenamer.rename;
-                fn(p, options.template, reporter);
+                if (is_dir) {
+                    cli.info('Processing directory: ' + p);
+                    exifRenamer.rename_dir(p, options.template, _.noop, reporter);
+                }
+                else if (is_file) {
+                    exifRenamer.rename(p, options.template, reporter);
+                }
+                else if (!is_file) {
+                    return cli.fatal(p + ' not found');
+                }
             }
             catch (e) {
+                console.log(e);
                 cli.info(Handlebars.compile('the argument "{{f}}" did not match any files')({f:f}));
             }
         }

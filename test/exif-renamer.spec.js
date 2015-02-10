@@ -8,6 +8,7 @@ var path = require('path'),
     fs = require('fs'),
     Q = require('q'),
     _ = require('lodash'),
+    sinon = require('sinon'),
     dateformat = require('dateformat'),
     template = '{{datetime}}_{{file}}',
     imgPath = path.resolve(__dirname, '../demo/img'),
@@ -47,8 +48,7 @@ helpers = {
     },
 
     getExif: function(path, callback) {
-        var Exif = require('exif').ExifImage;
-        new Exif({image: path}, callback);
+        require('../lib/exif-renamer.js')().exif(path, callback);
     }
 };
 
@@ -101,14 +101,7 @@ describe('exif-renamer', function() {
         it('should return EXIF data for the image at filepath', function(done) {
             exifRenamer.exif(imgExif, function(err, data) {
                 err.should.be.false;
-                data.should.have.properties(
-                    'image',
-                    'thumbnail',
-                    'exif',
-                    'gps',
-                    'interoperability',
-                    'makernote'
-                );
+                data.should.have.property('exif');
                 done();
             });
         });
@@ -154,16 +147,25 @@ describe('exif-renamer', function() {
         });
 
         it('should raise an error if filepath does not have a valid extension', function(done) {
-            var cfg = exifRenamer.config;
-            cfg.should.not.containEql('js');
-            cfg.valid_extensions = ['js'];
+            exifRenamer.config.valid_extensions.should.not.containEql('js');
+            exifRenamer.config.valid_extensions = ['js'];
             exifRenamer.process(imgExif, template, function(err) {
                 err.should.be.an.instanceOf(Error);
                 done();
             });
         });
 
-        it('should raise an error if filepath has no EXIF data', function(done) {
+        it('should raise an error if filepath has no EXIF data when config.require_exif=true', function(done) {
+            exifRenamer.config.require_exif = true;
+            exifRenamer.process(imgNoExif, template, function(err) {
+                err.should.be.an.instanceOf(Error);
+                done();
+            });
+        });
+
+        it('should raise an error if filepath has no EXIF data when config.require_exif=false and config.fallback_ctime=false', function(done) {
+            exifRenamer.config.require_exif = false;
+            exifRenamer.config.fallback_ctime = false;
             exifRenamer.process(imgNoExif, template, function(err) {
                 err.should.be.an.instanceOf(Error);
                 done();
@@ -199,7 +201,7 @@ describe('exif-renamer', function() {
 
         it('should use DateTimeOriginal as datetime if available', function(done) {
             exifRenamer.process(imgExif, template, function(err, result) {
-                result.original.datetime.should.eql(testExif.exif.DateTimeOriginal);
+                result.original.datetime.should.eql(testExif.exif.DateTimeOriginal * 1000);
                 done();
             });
         });
@@ -208,7 +210,6 @@ describe('exif-renamer', function() {
             exifRenamer.config.ctime_fallback = true;
             exifRenamer.config.require_exif = false;
             exifRenamer.process(imgNoExif, template, function(err, result) {
-                result.original.should.not.have.properties('exif');
                 result.original.datetime.should.eql(result.original.stat.ctime);
                 done();
             });
@@ -362,7 +363,7 @@ describe('exif-renamer', function() {
     });
 
     /**
-     * #rename_dir(dirpath, template, callback, ignore_errors)
+     * #rename_dir(dirpath, template [recursive=false, callback, itemCallback])
      */
     describe('#rename_dir', function() {
 
@@ -408,7 +409,24 @@ describe('exif-renamer', function() {
             });
         });
 
-        it('should rename all files in the source directory only', function(done) {
+        it('should return a promise', function() {
+            var p = exifRenamer.rename_dir(tmpFromDir, template, _.noop);
+            Q.isPromise(p).should.be.true;
+        });
+
+        it('should call the itemCallback for each file and the final callback once', function(done) {
+            var itemCallback = sinon.spy(),
+                callback = sinon.stub();
+
+            exifRenamer.rename_dir(tmpFromDir, template, callback, itemCallback).then(function(results) {
+                results.length.should.eql(imgs.length * 3);
+                itemCallback.callCount.should.eql(imgs.length * 3);
+                callback.callCount.should.eql(1);
+                done();
+            });
+        });
+
+        it('should rename all files in the source directory only when recursive=false', function(done) {
             exifRenamer.rename_dir(tmpFromDir, template, function(err, results) {
                 err.should.be.false;
                 results.length.should.equal(imgs.length * 3);
@@ -437,7 +455,7 @@ describe('exif-renamer', function() {
     /**
      * #watch(dirpath, template, callback)
      */
-    describe('#watch (tests run slowly due to filesystem dependency)', function() {
+    xdescribe('#watch (tests run slowly due to filesystem dependency)', function() {
 
         var watchDir = path.join(__dirname, 'tmp');
 
