@@ -305,7 +305,12 @@ If you have a feature request or bug report please
 If you are a developer please feel free to get involved and send a pull request with
 your enhancements or bugfix.
 
+## Roadmap
+* Swap out Grunt for Gulp
+
 ## Release History
+* 1.0.0
+  * No changes from 0.7.0, which was a good RC for 1.0.0
 * 0.7.0
   * Fixed [#3](https://github.com/dylansmith/node-exif-renamer/issues/3):
     * `#rename_dir` now takes an `itemCallback` which is called after each file is processed
