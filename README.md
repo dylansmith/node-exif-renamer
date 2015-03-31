@@ -46,6 +46,7 @@ Options:
   -e, --exif             get the exif data for the specified image
   -f, --filetypes STRING comma-separated list of file extensions to process
                          (jpg and jpeg are default)
+  -l, --list             list available template variables
   -o, --overwrite        overwrite existing files
   -r, --recursive        recursively process the specified directory
   -t, --template [STRING]renaming template (Default is {{datetime}}_{{file}})
@@ -169,6 +170,8 @@ path information, and some other useful stuff:
     'time':     <EXIF time formatted using the value of config.formats.time>
 }
 ```
+
+You can view all the available template variables by using the `-l` command-line switch.
 
 ### Methods
 
@@ -309,6 +312,9 @@ your enhancements or bugfix.
 * Swap out Grunt for Gulp
 
 ## Release History
+* 1.1.0
+  * Added the `-l` command line switch to list metadata, in response to
+    [#7](https://github.com/dylansmith/node-exif-renamer/issues/7)
 * 1.0.0
   * No changes from 0.7.0, which was a good RC for 1.0.0
 * 0.7.0

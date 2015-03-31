@@ -14,6 +14,7 @@ cli.parse({
     dryrun:    ['d', 'run without performing filesystem changes'],
     exif:      ['e', 'get the exif data for the specified image'],
     filetypes: ['f', 'comma-separated list of file extensions to process (jpg and jpeg are default)', 'string'],
+    list:      ['l', 'list available template variables'],
     overwrite: ['o', 'overwrite existing files'],
     recursive: ['r', 'recursively process the specified directory'],
     template:  ['t', 'renaming template', 'string', '{{datetime}}_{{file}}'],
@@ -98,6 +99,16 @@ cli.main(function(args, options) {
                 if (err) return cli.error(err);
                 cli.info('EXIF data for ' + p);
                 console.log(exif);
+            });
+        }
+
+        else if (options.list) {
+            if (!is_file) {
+                return cli.fatal('the --list option requires a valid file');
+            }
+            exifRenamer.get_metadata(p, function(err, metadata) {
+                if (err) return cli.error(err);
+                console.log(metadata);
             });
         }
 
