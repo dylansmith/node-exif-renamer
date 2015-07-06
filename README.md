@@ -3,8 +3,6 @@
 A NodeJS library & shell command to rename photos using their EXIF data.
 It can also be set to watch a directory and automatically process images copied to it.
 
-[![Gitter chat](https://badges.gitter.im/dylansmith/node-exif-renamer.png)](https://gitter.im/dylansmith/node-exif-renamer)
-
 ## Installation
 
 To use it as a dependency in your Node project, install it locally using:
@@ -254,22 +252,22 @@ template/callback.
 
 ##### arguments
 
-- `filepath` the path to the image file
+- `dirpath` the path to the directory
 - `template` the renaming template or a custom callback function
 - `[recursive=false]` boolean switch to enable recursive processing, defaults to false
-- `callback` the node-style callback called once all files have been processed
-- `itemCallback` the node-style callback called after each file is processed
+- `[callback]` the node-style callback called once all files have been processed
+- `[itemCallback]` the node-style callback called after each file is processed
 
 ##### usage
 
 ```javascript
 // using a handlebars template
-exifRenamer.rename('path/to/image.file', 'renaming-template', function(err, result) {
+exifRenamer.rename_dir('path/to/dir', 'renaming-template', function(err, result) {
     //...
 });
 
 // using a custom function
-exifRenamer.rename('path/to/image.file', customRenamer, function(err, result) {
+exifRenamer.rename_dir('path/to/dir', customRenamer, function(err, result) {
     //...
 });
 ```
@@ -312,6 +310,8 @@ your enhancements or bugfix.
 * Swap out Grunt for Gulp
 
 ## Release History
+* 1.1.1
+  * updated incorrect docs [fixed #8]
 * 1.1.0
   * Added the `-l` command line switch to list metadata, in response to
     [#7](https://github.com/dylansmith/node-exif-renamer/issues/7)
