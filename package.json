@@ -1,7 +1,7 @@
 {
   "name": "exif-renamer",
   "description": "A NodeJS library & shell command to rename photos using their EXIF data.",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "homepage": "https://github.com/dylansmith/node-exif-renamer",
   "author": {
     "name": "Dylan Smith",
@@ -28,7 +28,7 @@
     "node": ">= 0.10.0"
   },
   "scripts": {
-    "test": "grunt nodeunit"
+    "test": "grunt test"
   },
   "devDependencies": {
     "grunt": "~0.4.2",
@@ -41,7 +41,7 @@
   },
   "keywords": [],
   "dependencies": {
-    "exif-parser": "git://github.com/dylansmith/exif-parser.git#improve-date-parsing",
+    "exif-parser": "~0.1.9",
     "q": "~1.0.0",
     "dateformat": "~1.0.7-1.2.3",
     "lodash": "~3.1.0",

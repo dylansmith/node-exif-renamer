@@ -310,6 +310,10 @@ your enhancements or bugfix.
 * Swap out Grunt for Gulp
 
 ## Release History
+* 1.1.2
+  * switched back to fixed `exif-parser@0.1.9` dependency
+  * added test for alternate date parsing
+  * fixed `npm run test` task
 * 1.1.1
   * updated incorrect docs [fixed #8]
 * 1.1.0

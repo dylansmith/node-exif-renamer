@@ -106,6 +106,16 @@ describe('exif-renamer', function() {
             });
         });
 
+        it('should handle alternate date formats (see #5)', function(done) {
+            var img = path.join(__dirname, 'img', 'alt-date-format.jpg');
+            exifRenamer.exif(img, function(err, data) {
+                err.should.be.false;
+                data.should.have.property('exif');
+                data.exif.DateTimeOriginal.should.equal(1151755457);
+                done();
+            });
+        });
+
     });
 
     /**
