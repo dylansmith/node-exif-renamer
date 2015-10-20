@@ -45,7 +45,6 @@ Options:
   -f, --filetypes STRING comma-separated list of file extensions to process
                          (jpg and jpeg are default)
   -l, --list             list available template variables
-  -o, --overwrite        overwrite existing files
   -r, --recursive        recursively process the specified directory
   -t, --template [STRING]renaming template (Default is {{datetime}}_{{file}})
   -w, --watch            watch the specified directory for changes and
@@ -64,7 +63,6 @@ The following configuration options are available when using _exif-renamer_ as a
 {
     dryrun: false,                          // simulate processing without modifying the filesystem
     fallback_ctime: true,                   // fallback to filesystem ctime if no EXIF DateTimeOriginal
-    overwrite: false,                       // overwrite existing files?
     require_exif: false,                    // fail if EXIF data is not found?
     path_separator: '/',                    // the character used to separate paths in templates
     formats: {
@@ -310,6 +308,11 @@ your enhancements or bugfix.
 * Swap out Grunt for Gulp
 
 ## Release History
+* 1.2.0
+  * Introduced filename conflict resolution via sequential filenaming
+    in response to [#9](https://github.com/dylansmith/node-exif-renamer/issues/9)
+  * Deprecated the `overwrite` flag
+  * Reduced size of test/demo images
 * 1.1.2
   * switched back to fixed `exif-parser@0.1.9` dependency
   * added test for alternate date parsing

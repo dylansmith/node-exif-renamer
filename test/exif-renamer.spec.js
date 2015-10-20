@@ -8,15 +8,16 @@ var path = require('path'),
     fs = require('fs'),
     Q = require('q'),
     _ = require('lodash'),
+    async = require('async'),
     sinon = require('sinon'),
     dateformat = require('dateformat'),
     template = '{{datetime}}_{{file}}',
-    imgPath = path.resolve(__dirname, '../demo/img'),
+    imgPath = path.resolve(__dirname, 'img'),
     imgExif = path.join(imgPath, 'exif.jpg'),
     imgNoExif = path.join(imgPath, 'no_exif.jpg'),
     notDir = path.join(imgPath, 'NOPE'),
     notFile = path.join(imgPath, 'NOPE.jpg'),
-    unsupportedFile = path.join(imgPath, '../helpers.js'),
+    unsupportedFile = path.resolve(__dirname, '..', 'package.json'),
     helpers, testExif, exifRenamer;
 
 helpers = {
@@ -318,26 +319,10 @@ describe('exif-renamer', function() {
 
         it('should not overwrite files', function(done) {
             exifRenamer.config.overwrite.should.be.false;
-            exifRenamer.rename(tmpExif, '{{file}}', function(err) {
-                err.should.be.an.instanceOf(Error);
+            exifRenamer.rename(tmpExif, '{{file}}', function(err, result) {
+                err.should.be.false;
+                path.basename(result.processed.path).should.equal('exif(1).jpg')
                 done();
-            });
-        });
-
-        it('should overwrite files when config.overwrite=true', function(done) {
-            var targetPath = path.join(tmpDir, 'target.jpg');
-            // create the target file
-            helpers.cp(imgExif, targetPath, function() {
-                fs.existsSync(targetPath).should.be.true;
-                // rename to existing path
-                exifRenamer.config.overwrite = true;
-                exifRenamer.rename(tmpExif, '{{dir}}:target.jpg', function(err, result) {
-                    err.should.be.false;
-                    result.processed.path.should.equal(targetPath);
-                    fs.existsSync(targetPath).should.be.true;
-                    fs.existsSync(tmpExif).should.be.false;
-                    done();
-                });
             });
         });
 
@@ -370,6 +355,25 @@ describe('exif-renamer', function() {
             });
         });
 
+        it('should handle filename clashes via an auto-incrementing suffix', function(done) {
+            var results = [];
+            var renameTest = function(cb) {
+                helpers.cp(imgExif, tmpExif, function() {
+                    exifRenamer.rename(tmpExif, template, function(err, result) {
+                        err.should.be.false;
+                        results.push(result);
+                        cb();
+                    });
+                });
+            }
+
+            async.series([renameTest, renameTest, renameTest], function() {
+                results[0].processed.path.should.match(/_exif\.jpg$/)
+                results[1].processed.path.should.match(/_exif\(1\)\.jpg$/)
+                results[2].processed.path.should.match(/_exif\(2\)\.jpg$/)
+                done();
+            });
+        });
     });
 
     /**
