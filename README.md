@@ -44,6 +44,8 @@ Options:
   -e, --exif             get the exif data for the specified image
   -f, --filetypes STRING comma-separated list of file extensions to process
                          (jpg and jpeg are default)
+  -g, --glob STRING      glob pattern to filter files for processing within a
+                         target directory (overrides --recursive)
   -l, --list             list available template variables
   -r, --recursive        recursively process the specified directory
   -t, --template [STRING]renaming template (Default is {{datetime}}_{{file}})
@@ -245,14 +247,17 @@ exifRenamer.rename('path/to/image.file', customRenamer, function(err, result) {
 
 #### #rename_dir
 
-Renames/moves all applicable images in the specified directory,  using the provided
-template/callback.
+Renames/moves all applicable images in the specified directory,  using the provided template/callback.
 
 ##### arguments
 
 - `dirpath` the path to the directory
 - `template` the renaming template or a custom callback function
-- `[recursive=false]` boolean switch to enable recursive processing, defaults to false
+- `[recursiveOrGlob=false]` boolean switch to enable recursive processing, defaults to false. Since 1.2.0, it can also accept a glob pattern which is applied to the target directory. Some examples:
+  - `'**'` is the equivalent of `true`
+  - `'*'` is the equivalent of `false`
+  - `**/*.jpg` would recursively select only `.jpg` files
+  - `*.tiff` would non-recursively select only `.tiff` files
 - `[callback]` the node-style callback called once all files have been processed
 - `[itemCallback]` the node-style callback called after each file is processed
 
@@ -311,7 +316,11 @@ your enhancements or bugfix.
 * 1.2.0
   * Introduced filename conflict resolution via sequential filenaming
     in response to [#9](https://github.com/dylansmith/node-exif-renamer/issues/9)
-  * Deprecated the `overwrite` flag
+  * Deprecated the `--overwrite` flag
+  * Added support for passing globs to `rename_dir`, exposed via the 
+    `--glob` cli flag. This option will override `--recursive` and allow 
+    for greater control of file processing (thanks to @TotallyInformation
+    for the suggestion).
   * Reduced size of test/demo images
 * 1.1.2
   * switched back to fixed `exif-parser@0.1.9` dependency

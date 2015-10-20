@@ -377,7 +377,7 @@ describe('exif-renamer', function() {
     });
 
     /**
-     * #rename_dir(dirpath, template [recursive=false, callback, itemCallback])
+     * #rename_dir(dirpath, template[, filesGlob='**', callback, itemCallback])
      */
     describe('#rename_dir', function() {
 
@@ -456,6 +456,18 @@ describe('exif-renamer', function() {
             exifRenamer.rename_dir(tmpFromDir, template, true, function(err, results) {
                 err.should.be.false;
                 results.length.should.equal(imgs.length * 3 * 2);
+                results.forEach(function(r) {
+                    fs.existsSync(r.original.path).should.be.false;
+                    fs.existsSync(r.processed.path).should.be.true;
+                });
+                done();
+            });
+        });
+
+        it('should accept a glob to filter files for processing', function(done) {
+           exifRenamer.rename_dir(tmpFromDir, template, '**/1_*.jpg', function(err, results) {
+                err.should.be.false;
+                results.length.should.equal(4);
                 results.forEach(function(r) {
                     fs.existsSync(r.original.path).should.be.false;
                     fs.existsSync(r.processed.path).should.be.true;

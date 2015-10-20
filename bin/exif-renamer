@@ -14,8 +14,8 @@ cli.parse({
     dryrun:    ['d', 'run without performing filesystem changes'],
     exif:      ['e', 'get the exif data for the specified image'],
     filetypes: ['f', 'comma-separated list of file extensions to process (jpg and jpeg are default)', 'string'],
+    glob:      ['g', 'glob pattern to filter files for processing within a target directory (overrides --recursive)', 'string'],
     list:      ['l', 'list available template variables'],
-    overwrite: ['o', 'overwrite existing files'],
     recursive: ['r', 'recursively process the specified directory'],
     template:  ['t', 'renaming template', 'string', '{{datetime}}_{{file}}'],
     watch:     ['w', 'watch the specified directory for changes and process automatically']
@@ -43,9 +43,6 @@ cli.main(function(args, options) {
 
     // set dryrun
     exifRenamer.config.dryrun = options.dryrun;
-
-    // set overwrite
-    exifRenamer.config.overwrite = options.overwrite;
 
     // set valid_extensions
     if (options.filetypes) {
@@ -84,7 +81,7 @@ cli.main(function(args, options) {
             exifRenamer.watch(p, options.template, reporter);
         }
 
-        else if (options.recursive) {
+        else if (options.recursive && !options.glob) {
             if (!is_dir) {
                 return cli.fatal('the --recursive option requires a valid directory');
             }
@@ -116,7 +113,7 @@ cli.main(function(args, options) {
             try {
                 if (is_dir) {
                     cli.info('Processing directory: ' + p);
-                    exifRenamer.rename_dir(p, options.template, _.noop, reporter);
+                    exifRenamer.rename_dir(p, options.template, options.glob || null, _.noop, reporter);
                 }
                 else if (is_file) {
                     exifRenamer.rename(p, options.template, reporter);
