@@ -38,8 +38,8 @@ Usage:
   exif-renamer [OPTIONS] [ARGS]
 
 Options:
-  -c, --no_ctime         do not use the ctime fallback if no EXIF data is present
-                         (also sets require_exif=true)
+  -c, --no_ctime         do not use the filesystem creation time fallback if
+                         no EXIF data is present (also sets require_exif=true)
   -d, --dryrun           run without performing filesystem changes
   -e, --exif             get the exif data for the specified image
   -f, --filetypes STRING comma-separated list of file extensions to process
@@ -64,7 +64,7 @@ The following configuration options are available when using _exif-renamer_ as a
 ```javascript
 {
     dryrun: false,                          // simulate processing without modifying the filesystem
-    fallback_ctime: true,                   // fallback to filesystem ctime if no EXIF DateTimeOriginal
+    fallback_ctime: true,                   // fallback to filesystem creation time if no EXIF DateTimeOriginal
     require_exif: false,                    // fail if EXIF data is not found?
     path_separator: '/',                    // the character used to separate paths in templates
     formats: {
@@ -163,7 +163,7 @@ path information, and some other useful stuff:
     'stat':     <see: http://nodejs.org/api/fs.html#fs_class_fs_stats>,
 
     // other useful stuff
-    'datetime': <EXIF date or ctime>,
+    'datetime': <EXIF date or filesystem creation time>,
     'date':     <EXIF date formatted using the value of config.formats.date>,
     'time':     <EXIF time formatted using the value of config.formats.time>
 }
@@ -317,8 +317,8 @@ your enhancements or bugfix.
   * Introduced filename conflict resolution via sequential filenaming
     in response to [#9](https://github.com/dylansmith/node-exif-renamer/issues/9)
   * Deprecated the `--overwrite` flag
-  * Added support for passing globs to `rename_dir`, exposed via the 
-    `--glob` cli flag. This option will override `--recursive` and allow 
+  * Added support for passing globs to `rename_dir`, exposed via the
+    `--glob` cli flag. This option will override `--recursive` and allow
     for greater control of file processing (thanks to @TotallyInformation
     for the suggestion).
   * Reduced size of test/demo images

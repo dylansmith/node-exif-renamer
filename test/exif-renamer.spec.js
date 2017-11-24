@@ -217,11 +217,17 @@ describe('exif-renamer', function() {
             });
         });
 
-        it('should fallback to ctime if required', function(done) {
+        it('should fallback to earliest of birthtime, ctime, mtime if required', function(done) {
             exifRenamer.config.ctime_fallback = true;
             exifRenamer.config.require_exif = false;
             exifRenamer.process(imgNoExif, template, function(err, result) {
-                result.original.datetime.should.eql(result.original.stat.ctime);
+                var expected = Math.min(
+                    result.original.stat.birthtime,
+                    result.original.stat.ctime,
+                    result.original.stat.mtime
+                )
+                result.original.datetime.should.eql(expected);
+                (typeof result.original.datetime).should.eql(typeof new Date());
                 done();
             });
         });
