@@ -218,18 +218,38 @@ describe('exif-renamer', function() {
         });
 
         it('should fallback to earliest of birthtime, ctime, mtime if required', function(done) {
-            exifRenamer.config.ctime_fallback = true;
-            exifRenamer.config.require_exif = false;
-            exifRenamer.process(imgNoExif, template, function(err, result) {
-                var expected = Math.min(
-                    result.original.stat.birthtime,
-                    result.original.stat.ctime,
-                    result.original.stat.mtime
-                )
-                result.original.datetime.should.eql(expected);
-                (typeof result.original.datetime).should.eql(typeof new Date());
-                done();
+            var t1 = new Date(2017, 1, 15, 10);
+            var t2 = new Date(2017, 2, 15, 10);
+            var t3 = new Date(2017, 3, 15, 10);
+
+            var tests = [
+                { birthtime: t1, ctime: t2, mtime: t3 },
+                { birthtime: t2, ctime: t1, mtime: t3 },
+                { birthtime: t3, ctime: t2, mtime: t1 },
+            ].map(function(times) {
+                return function(cb) {
+                    var mock = Object.assign({
+                        isDirectory: function() {
+                            return false;
+                        },
+                        isFile: function() {
+                            return true;
+                        },
+                    }, times);
+
+                    sinon.stub(fs, 'lstatSync').returns(mock);
+                    exifRenamer.config.ctime_fallback = true;
+                    exifRenamer.config.require_exif = false;
+                    exifRenamer.process(imgNoExif, template, function(err, result) {
+                        result.original.datetime.should.eql(t1);
+                        (typeof result.original.datetime).should.eql(typeof t1);
+                        fs.lstatSync.restore();
+                        cb();
+                    });
+                }
             });
+
+            async.series(tests, done);
         });
 
         it('should format datetime correctly', function(done) {
@@ -377,6 +397,9 @@ describe('exif-renamer', function() {
                 results[0].processed.path.should.match(/_exif\.jpg$/)
                 results[1].processed.path.should.match(/_exif\(1\)\.jpg$/)
                 results[2].processed.path.should.match(/_exif\(2\)\.jpg$/)
+                fs.existsSync(results[0].processed.path).should.be.true;
+                fs.existsSync(results[1].processed.path).should.be.true;
+                fs.existsSync(results[2].processed.path).should.be.true;
                 done();
             });
         });
