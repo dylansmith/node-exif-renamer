@@ -1,4 +1,4 @@
-/*global describe, it, beforeEach, after */
+/*global describe, xdescribe, it, beforeEach, after */
 /*jshint expr:true, debug:true */
 
 var should = require('should');
@@ -37,7 +37,7 @@ helpers = {
         for(var i = 0; i < list.length; i++) {
             var filename = path.join(dir, list[i]);
             var stat = fs.statSync(filename);
-            if (filename === "." || filename === "..") {
+            if (filename === '.' || filename === '..') {
                 // skip
             } else if (stat.isDirectory()) {
                 this.rmdir(filename);
@@ -246,7 +246,7 @@ describe('exif-renamer', function() {
                         fs.lstatSync.restore();
                         cb();
                     });
-                }
+                };
             });
 
             async.series(tests, done);
@@ -301,14 +301,14 @@ describe('exif-renamer', function() {
             });
 
             Q.allSettled(promises)
-            .then(function(results) {
-                results.forEach(function(result) {
-                    var expectedPath = examples[result.value.template];
-                    result.value.processed.path.should.equal(expectedPath);
-                });
-                done();
-            })
-            .catch(done);
+                .then(function(results) {
+                    results.forEach(function(result) {
+                        var expectedPath = examples[result.value.template];
+                        result.value.processed.path.should.equal(expectedPath);
+                    });
+                    done();
+                })
+                .catch(done);
         });
 
     });
@@ -347,7 +347,7 @@ describe('exif-renamer', function() {
             exifRenamer.config.overwrite.should.be.false;
             exifRenamer.rename(tmpExif, '{{file}}', function(err, result) {
                 err.should.be.false;
-                path.basename(result.processed.path).should.equal('exif(1).jpg')
+                path.basename(result.processed.path).should.equal('exif(1).jpg');
                 done();
             });
         });
@@ -391,12 +391,12 @@ describe('exif-renamer', function() {
                         cb();
                     });
                 });
-            }
+            };
 
             async.series([renameTest, renameTest, renameTest], function() {
-                results[0].processed.path.should.match(/_exif\.jpg$/)
-                results[1].processed.path.should.match(/_exif\(1\)\.jpg$/)
-                results[2].processed.path.should.match(/_exif\(2\)\.jpg$/)
+                results[0].processed.path.should.match(/_exif\.jpg$/);
+                results[1].processed.path.should.match(/_exif\(1\)\.jpg$/);
+                results[2].processed.path.should.match(/_exif\(2\)\.jpg$/);
                 fs.existsSync(results[0].processed.path).should.be.true;
                 fs.existsSync(results[1].processed.path).should.be.true;
                 fs.existsSync(results[2].processed.path).should.be.true;
@@ -494,7 +494,7 @@ describe('exif-renamer', function() {
         });
 
         it('should accept a glob to filter files for processing', function(done) {
-           exifRenamer.rename_dir(tmpFromDir, template, '**/1_*.jpg', function(err, results) {
+            exifRenamer.rename_dir(tmpFromDir, template, '**/1_*.jpg', function(err, results) {
                 err.should.be.false;
                 results.length.should.equal(4);
                 results.forEach(function(r) {
