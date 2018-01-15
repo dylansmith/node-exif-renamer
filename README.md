@@ -322,6 +322,8 @@ your enhancements or bugfix.
     for greater control of file processing (thanks to @TotallyInformation
     for the suggestion).
   * Reduced size of test/demo images
+  * Upgraded most dependencies
+  * Swapped out Grunt-based tooling for npm scripts
 * 1.1.2
   * switched back to fixed `exif-parser@0.1.9` dependency
   * added test for alternate date parsing
