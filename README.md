@@ -316,6 +316,7 @@ your enhancements or bugfix.
 * 1.2.0
   * Introduced filename conflict resolution via sequential filenaming
     in response to [#9](https://github.com/dylansmith/node-exif-renamer/issues/9)
+  * Fixed incorrect calculation of modified time on some systems [#10](https://github.com/dylansmith/node-exif-renamer/issues/10)
   * Deprecated the `--overwrite` flag
   * Added support for passing globs to `rename_dir`, exposed via the
     `--glob` cli flag. This option will override `--recursive` and allow
