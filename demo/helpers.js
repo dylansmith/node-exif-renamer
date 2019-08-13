@@ -1,4 +1,4 @@
-var S = require('string'),
+var _ = require('lodash'),
     path = require('path');
 
 module.exports = {
@@ -11,7 +11,7 @@ module.exports = {
         ul = ul || '=';
         prefix = prefix || '';
         suffix = suffix || '';
-        console.log(this.clr.whiteBright(prefix + text + '\n' + S(ul).repeat(text.length) + suffix));
+        console.log(this.clr.whiteBright(prefix + text + '\n' + _.repeat(ul, text.length) + suffix));
     }
 
 };

@@ -313,6 +313,8 @@ your enhancements or bugfix.
 * Swap out Grunt for Gulp
 
 ## Release History
+* 1.2.1
+  * Updated dependencies
 * 1.2.0
   * Introduced filename conflict resolution via sequential filenaming
     in response to [#9](https://github.com/dylansmith/node-exif-renamer/issues/9)

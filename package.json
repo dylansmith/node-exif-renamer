@@ -34,24 +34,23 @@
   },
   "devDependencies": {
     "async": "^1.5.2",
-    "eslint": "^4.15.0",
-    "mocha": "^1.21.5",
-    "nyc": "^11.4.1",
+    "eslint": "6.1.0",
+    "mocha": "6.2.0",
+    "nyc": "14.1.1",
     "should": "^3.3.2",
     "sinon": "^1.12.2"
   },
   "keywords": [],
   "dependencies": {
-    "cli": "^0.4.5",
-    "cli-color": "^0.2.3",
+    "cli": "1.0.1",
+    "cli-color": "1.4.0",
     "dateformat": "^1.0.12",
     "exif-parser": "^0.1.12",
-    "glob": "^3.2.11",
-    "handlebars": "^4.0.11",
-    "lodash": "^3.10.1",
+    "glob": "7.1.4",
+    "handlebars": "4.1.2",
+    "lodash": "4.17.15",
     "mkdirp": "^0.5.1",
     "q": "1.0.0",
-    "string": "^1.9.1",
     "watchr": "^2.6.0"
   }
 }
