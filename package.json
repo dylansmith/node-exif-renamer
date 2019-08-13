@@ -1,7 +1,7 @@
 {
   "name": "exif-renamer",
   "description": "A NodeJS library & shell command to rename photos using their EXIF data.",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "homepage": "https://github.com/dylansmith/node-exif-renamer",
   "author": {
     "name": "Dylan Smith",
