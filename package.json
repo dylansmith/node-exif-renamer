@@ -47,7 +47,7 @@
     "dateformat": "^1.0.12",
     "exif-parser": "^0.1.12",
     "glob": "7.1.4",
-    "handlebars": "4.1.2",
+    "handlebars": "4.3.0",
     "lodash": "4.17.15",
     "mkdirp": "^0.5.1",
     "q": "1.0.0",
