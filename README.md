@@ -313,6 +313,8 @@ your enhancements or bugfix.
 * Swap out Grunt for Gulp
 
 ## Release History
+* 1.2.2
+  * Updated dependencies
 * 1.2.1
   * Updated dependencies
 * 1.2.0
