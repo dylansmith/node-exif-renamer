@@ -48,7 +48,7 @@
     "exif-parser": "^0.1.12",
     "glob": "7.1.6",
     "handlebars": "4.5.3",
-    "lodash": "4.17.15",
+    "lodash": "4.17.19",
     "mkdirp": "^0.5.1",
     "q": "1.0.0",
     "watchr": "^2.6.0"
